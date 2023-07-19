@@ -26,20 +26,17 @@ export class ControllerbasicsController {
     @Redirect() to redirect, dynamically redirect by returning {url,statusCode}
    */
 
-  @Get("host")   
-  @Header("Cache-Control","none")             
+  @Get("host")               
   getHost(@HostParam("account") hostname:string){    
     return `the host is ${hostname}`;                         
   } 
 
-  @Get("query")   
-  @Header("Cache-Control","none")             
+  @Get("query")               
   getQuery(@Query() query:string){    
     return `the query data is ${query}` ;                         
   }
   
   @Get("gotonest")   
-  @Header("Cache-Control","none")  
   @Redirect('https://nestjs.com', 301)           
   getNest(@Query() query:string){    
     return "this will not be visible" ;                         
