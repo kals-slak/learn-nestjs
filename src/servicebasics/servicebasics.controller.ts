@@ -12,12 +12,12 @@ export class ServicebasicsController {
   constructor(private readonly servicebasicsService: ServicebasicsService) {}
 
   @Get()
-  findAll(): todo[]{
+  findAll(){
     return this.servicebasicsService.findAll();
   }
 
   @Get(":id")
-  findById(@Param("id", ParseIntPipe) id:number): todo{
+  findById(@Param("id") id:string){
     return this.servicebasicsService.findById(id);
   }
 
@@ -34,7 +34,7 @@ export class ServicebasicsController {
   }
 
   @Delete(":id")
-  remove(@Param("id", ParseIntPipe) id:number){
+  remove(@Param("id") id:string){
     return this.servicebasicsService.remove(id);
   }
 

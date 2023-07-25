@@ -1,31 +1,58 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { todo } from './interfaces/todo';
+import { REQUEST } from '@nestjs/core';
+import { TODO_MODEL, TodoDocument } from './Schemas/todo.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class ServicebasicsService {
+    // constructor(@Inject(REQUEST) private request: Request) {}
+    constructor(@InjectModel(TODO_MODEL) private readonly TodoModel:Model<TodoDocument>){}
     private todos: todo[] = [];
 
-    add(val: todo): void{
-        this.todos.push(val);
+    async add(val: todo){
+        try{
+            const todo = await this.TodoModel.create(val);
+            return todo;
+        }
+        catch(err){
+            if(err.name == "ValidationError"){
+                throw new BadRequestException(err.errors);
+            }
+            throw new ServiceUnavailableException();
+        }
     }
 
-    findById(id: number): todo{
-        // console.log("todo is: "+JSON.stringify(this.todos.filter((t)=> t.id == id)[0])+" id is"+id);
-        return this.todos.filter((t)=> t.id == id)[0];
-
+    async findById(id: string){
+        const todo = await this.TodoModel.findById(id);
+        if(!todo){
+            throw new NotFoundException("todo not found");
+        }
+        return todo;
     }
 
-    findAll(): todo[]{
-        return this.todos;
+    async findAll(){
+        const todos = await this.TodoModel.find();
+        if(!todos){
+            throw new NotFoundException("no todos exist");
+        }
+        return todos;
     }
 
-    update(todo: todo){
-        let ind:number = this.todos.findIndex((t)=> t.id==todo.id);
-        this.todos[ind] = todo;
+    async update(todo: todo){
+        const updatedtodo = await this.TodoModel.findByIdAndUpdate(todo._id, todo);
+        if(!updatedtodo){
+            throw new NotFoundException("todo doesn't exist");
+        }
+        return updatedtodo;
     }
 
-    remove(id:number){
-        let ind:number = this.todos.findIndex((t)=> t.id==id);
-        this.todos.splice(ind,1);
+    async remove(id:string){
+        const deletedTodo = await this.TodoModel.findByIdAndDelete(id); 
+        if(!deletedTodo){
+            throw new NotFoundException("todo not exist");
+        }
+        return {_id:id};
     }
 }

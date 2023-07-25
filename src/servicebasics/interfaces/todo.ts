@@ -2,13 +2,12 @@ const Joi = require('joi');
 
 
 export interface todo{
-    id: number;
+    _id:string;
     todo: string;
     isdone: boolean;
 }
 
 export const todoSchema = Joi.object({
-    id: Joi.number().required(),
     todo: Joi.string().required(),
     isdone: Joi.boolean().required(),
   })
